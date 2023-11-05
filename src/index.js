@@ -69,14 +69,16 @@ async function loadMoreBotton() {
     quantityImg += data.hits.length;
     const cardsCreate = cardListMarkup(data.hits);
     elements.cardList.insertAdjacentHTML('beforeend', cardsCreate);
-    if (data.hits.length < 40) {
+
+    if (data.hits.length < 40 || data.totalHits <= quantityImg) {
       elements.btnLoadMore.style.display = 'none';
       Notify.info("We're sorry, but you've reached the end of search results.");
     }
     
   } catch (error) {
-    Notify.failure(error.message);
-  } 
+    Notify.failure('Sorry, there are no images matching your search query. Please try again.');
+    elements.btnLoadMore.style.display = 'none'; 
+  }
 }
 
 
