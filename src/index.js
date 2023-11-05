@@ -16,7 +16,6 @@ elements.btnLoadMore.style.display = 'none';
 let quantityImg = 0;
 let page = 1;
 
-console.log(page)
 
 elements.form.addEventListener('submit', handlSubmit);
 elements.cardList.addEventListener('click', markupCardList);
@@ -24,14 +23,16 @@ elements.btnLoadMore.addEventListener('click', loadMoreBotton);
 
 
 async function handlSubmit(evt) {
+  
   evt.preventDefault();
   page = 1;
   elements.cardList.innerHTML = '';
-  const searchQuery = evt.target.elements.searchQuery.value;
+  const searchQuery = evt.target.elements.searchQuery.value.trim();
   localStorage.setItem('input-value', searchQuery);
   if (!searchQuery) {
     return Notify.failure('Enter your search details.');
   }
+elements.btnLoadMore.style.display = 'block';
   try {
     const data = await SearchService(page, searchQuery);
     quantityImg += data.hits.length;
@@ -49,19 +50,10 @@ async function handlSubmit(evt) {
     Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
     );
-  } finally {
-    gallery.refresh();
   }
+
 }
 
-
-
-
-
-
-
-
-console.log(page)
 
 async function markupCardList(evt) {
   evt.preventDefault();
@@ -77,18 +69,14 @@ async function loadMoreBotton() {
     quantityImg += data.hits.length;
     const cardsCreate = cardListMarkup(data.hits);
     elements.cardList.insertAdjacentHTML('beforeend', cardsCreate);
-
-
     if (data.hits.length < 40) {
       elements.btnLoadMore.style.display = 'none';
       Notify.info("We're sorry, but you've reached the end of search results.");
     }
+    
   } catch (error) {
     Notify.failure(error.message);
-  } finally {
-    gallery.refresh();
-  }
-  
+  } 
 }
 
 
@@ -136,4 +124,3 @@ function cardListMarkup(arr) {
     )
     .join('');
 }
-console.log(page)
