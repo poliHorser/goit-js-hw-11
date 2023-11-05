@@ -1,22 +1,14 @@
 
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import { SearchService } from './SearchService';
-
-
 const elements = {
   form: document.querySelector('.search-form'),
   cardList: document.querySelector('.gallery'),
   btnLoadMore: document.querySelector('.load-more-hidden'),
 };
-
-
 elements.btnLoadMore.style.display = 'none';
-
-
 let quantityImg = 0;
 let page = 1;
-
-
 elements.form.addEventListener('submit', handlSubmit);
 elements.cardList.addEventListener('click', markupCardList);
 elements.btnLoadMore.addEventListener('click', loadMoreBotton);
@@ -30,8 +22,12 @@ async function handlSubmit(evt) {
   const searchQuery = evt.target.elements.searchQuery.value.trim();
   localStorage.setItem('input-value', searchQuery);
   if (!searchQuery) {
-    return Notify.failure('Enter your search details.');
-  }
+      Notify.failure('Enter your search details.');
+      elements.btnLoadMore.style.display = 'none';
+      return;
+    }
+    
+  
 elements.btnLoadMore.style.display = 'block';
   try {
     const data = await SearchService(page, searchQuery);
@@ -46,20 +42,29 @@ elements.btnLoadMore.style.display = 'block';
     if (data.totalHits > quantityImg) {
       elements.btnLoadMore.style.display = 'block';
     }
+
+    const galleryElement = document.querySelector('.gallery');
+    if (galleryElement) {
+      const { height: cardHeight } =
+        galleryElement.firstElementChild.getBoundingClientRect();
+      window.scrollBy({
+        top: cardHeight * 2,
+        behavior: 'smooth',
+      }
+      );
+      
+    }
+   
   } catch (error) {
+    elements.btnLoadMore.style.display = 'none'
     Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
-    );
+    )
   }
-
 }
-
-
 async function markupCardList(evt) {
   evt.preventDefault();
-  gallery.next();
 }
-
 
 async function loadMoreBotton() {
   try {
@@ -74,12 +79,13 @@ async function loadMoreBotton() {
       elements.btnLoadMore.style.display = 'none';
       Notify.info("We're sorry, but you've reached the end of search results.");
     }
-    
+
   } catch (error) {
-    Notify.failure('Sorry, there are no images matching your search query. Please try again.');
-    elements.btnLoadMore.style.display = 'none'; 
+    Notify.failure(error.message);
+  } 
+    
   }
-}
+
 
 
 function cardListMarkup(arr) {
@@ -121,7 +127,6 @@ function cardListMarkup(arr) {
        </p>
      </div>
     </div>`
-
       }
     )
     .join('');
