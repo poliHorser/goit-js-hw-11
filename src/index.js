@@ -25,10 +25,15 @@ async function handlSubmit(evt) {
       Notify.failure('Enter your search details.');
       elements.btnLoadMore.style.display = 'none';
       return;
-    }
+  }
+  const inputValue = localStorage.getItem('input-value');
+  const data = await SearchService(page, inputValue);
+  if (data.totalHits > 40) {
+    elements.btnLoadMore.style.display = 'block';
+  }
   
   
-elements.btnLoadMore.style.display = 'block';
+
   try {
     const data = await SearchService(page, searchQuery);
     quantityImg += data.hits.length;
@@ -39,12 +44,7 @@ elements.btnLoadMore.style.display = 'block';
     if (data.totalHits !== 0) {
       Notify.info(`"Hooray! We found ${data.totalHits} images."`);
     }
-    const lastPage = Math.ceil(data.totalHits / 40)
-
-    if (lastPage === page) {
-      elements.btnLoadMore.style.display = 'none';
-      Notify.info("We're sorry, but you've reached the end of search results.");
-    }  
+     
     if (data.totalHits > quantityImg) {
       elements.btnLoadMore.style.display = 'block';
     }
@@ -81,7 +81,9 @@ async function loadMoreBotton() {
     quantityImg += data.hits.length;
     const cardsCreate = cardListMarkup(data.hits);
     elements.cardList.insertAdjacentHTML('beforeend', cardsCreate);
-    if (data.totalHits <= quantityImg) {
+    const lastPage = Math.ceil(data.totalHits / 40)
+
+    if (lastPage === page) {
       elements.btnLoadMore.style.display = 'none';
       Notify.info("We're sorry, but you've reached the end of search results.");
     } 
