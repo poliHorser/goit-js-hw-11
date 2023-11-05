@@ -10,6 +10,7 @@ const elements = {
 };
 
 
+elements.btnLoadMore.style.display = 'none';
 
 
 let quantityImg = 0;
@@ -24,7 +25,6 @@ elements.btnLoadMore.addEventListener('click', loadMoreBotton);
 async function handlSubmit(evt) {
   evt.preventDefault();
   elements.cardList.innerHTML = '';
-  elements.btnLoadMore.style.display = 'none';
 
 
   const searchQuery = evt.target.elements.searchQuery.value;
